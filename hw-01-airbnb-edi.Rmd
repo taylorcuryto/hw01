@@ -113,11 +113,13 @@ You can find descriptions of each of the variables in the help file for the data
 
 3.  Create a faceted histogram where each facet represents a neighbourhood and displays the distribution of Airbnb prices in that neighbourhood. Think critically about whether it makes more sense to stack the facets on top of each other in a column, lay them out in a row, or wrap them around. Along with your visualisation, include your reasoning for the layout you chose for your facets.
 
-````r
-ggplot(data = ___, mapping = aes(x = ___)) +
-  geom_histogram(binwidth = ___) +
-  facet_wrap(~___)
-````
+It makes more sense to wrap them around because if you just stacked them all in one column they would get smushed and same with if we only had one row. You would barely, or not at all, be able to see the data. This laout made the graphs more square like which allows me to see the most data.
+
+```{r hist}
+ggplot(data = edibnb, mapping = aes(x = price)) +
+  geom_histogram(binwidth = 10) +
+  facet_wrap(~ neighbourhood, ncol = 5)
+```
 
 Let's de-construct this code:
 

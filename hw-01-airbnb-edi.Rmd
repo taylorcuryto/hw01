@@ -113,7 +113,7 @@ You can find descriptions of each of the variables in the help file for the data
 
 3.  Create a faceted histogram where each facet represents a neighbourhood and displays the distribution of Airbnb prices in that neighbourhood. Think critically about whether it makes more sense to stack the facets on top of each other in a column, lay them out in a row, or wrap them around. Along with your visualisation, include your reasoning for the layout you chose for your facets.
 
-It makes more sense to wrap them around because if you just stacked them all in one column they would get smushed and same with if we only had one row. You would barely, or not at all, be able to see the data. This laout made the graphs more square like which allows me to see the most data.
+It makes more sense to wrap them around because if you just stacked them all in one column they would get smushed and same with if we only had one row. You would barely, or not at all, be able to see the data. This layout made the graphs more square like which allows me to see the most data.
 
 ```{r hist}
 ggplot(data = edibnb, mapping = aes(x = price)) +
@@ -131,7 +131,67 @@ Let's de-construct this code:
 🧶 ✅ ⬆️ Knit, *commit, and push your changes to GitHub with an appropriate commit message. Make sure to commit and push all changed files so that your Git pane is cleared up afterwards.*
 
 4.  Use a single pipeline to identity the neighbourhoods with the top five median listing prices. Then, in another pipeline filter the data for these five neighbourhoods and make ridge plots of the distributions of listing prices in these five neighbourhoods. In a third pipeline calculate the minimum, mean, median, standard deviation, IQR, and maximum listing price in each of these neighbourhoods. Use the visualisation and the summary statistics to describe the distribution of listing prices in the neighbourhoods. (Your answer will include three pipelines, one of which ends in a visualisation, and a narrative.)
+
+```{r}
+library(dplyr)
+
+top_neighbourhoods <- edibnb %>%
+  group_by(neighbourhood) %>%                         
+  summarize(median_price = median(price, na.rm=TRUE)) %>% 
+  arrange(desc(median_price)) %>%                    
+  head(5) 
+  
+top_neighbourhood_vector <- top_neighbourhoods %>%
+  pull(neighbourhood)
+
+print(top_neighbourhoods)
+
+```
+
+```{r}
+library(ggplot2)
+library(ggridges)
+
+filtered_data <- edibnb %>%
+  filter(neighbourhood == top_neighbourhood_vector)
+
+ggplot(filtered_data, aes(x = price, y = neighbourhood, fill = neighbourhood)) +
+  geom_density_ridges() +
+  labs(title = "Distribution of Listing Prices in Top 5 Neighbourhoods", 
+       x = "Listing Price", 
+       y = "Neighbourhood")
+```
+
+```{r}
+summary_stats <- filtered_data %>%
+  group_by(neighbourhood) %>%
+  summarize(
+    min_price = min(price, na.rm=TRUE),
+    mean_price = mean(price, na.rm=TRUE),
+    median_price = median(price, na.rm=TRUE),
+    sd_price = sd(price, na.rm=TRUE),
+    IQR_price = IQR(price, na.rm=TRUE),
+    max_price = max(price, na.rm=TRUE)
+  )
+
+print(summary_stats)
+
+```
+
+
+
 5.  Create a visualization that will help you compare the distribution of review scores (`review_scores_rating`) across neighbourhoods. You get to decide what type of visualisation to create and there is more than one correct answer! In your answer, include a brief interpretation of how Airbnb guests rate properties in general and how the neighbourhoods compare to each other in terms of their ratings.
+
+Most people rate these places fairly high with a few outliers. The location doesn't matter too much because every place has majority of the data above a 90.
+
+```{r}
+ggplot(edibnb, aes(x = neighbourhood, y = review_scores_rating, fill = neighbourhood)) +
+  geom_boxplot() +
+  labs(title = "Distribution of Review Scores Across Neighbourhoods",
+       x = "Neighbourhood", 
+       y = "Review Score Rating")
+```
+
 
 🧶 ✅ ⬆️ Knit, *commit, and push your changes to GitHub with an appropriate commit message. Make sure to commit and push all changed files so that your Git pane is cleared up afterwards and review the md document on GitHub to make sure you're happy with the final state of your work.*
 
